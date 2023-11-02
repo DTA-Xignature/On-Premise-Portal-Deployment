@@ -25,7 +25,7 @@ services:
   portal:
     container_name: portal
     restart: on-failure
-    image: registry.xignature.co.id/xignature/sign-portal:latest
+    image: registry.xignature.co.id/xignature/sign-portal:${DOCKER_TAG:- latest}
     ports:
       - "80:3000"
     networks:
@@ -33,7 +33,7 @@ services:
 
   gateway:
     container_name: gateway
-    image: registry.xignature.co.id/xignature/sign-gateway:${DOCKER_TAG:- latest}
+    image: registry.xignature.co.id/xignature/sign-gateway
     restart: on-failure
     environment:
       - TZ=Asia/Jakarta
