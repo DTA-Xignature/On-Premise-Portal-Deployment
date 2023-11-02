@@ -36,6 +36,13 @@ To deploy this project run
     docker-compose up -d
 ```
 
+For Pull Updated Image Using :
+
+```bash
+    docker-compose down
+    docker-compose up -d
+```
+
 ## Published URL
 
 - Portal URL : http://ip-or-localhost-or-domain
