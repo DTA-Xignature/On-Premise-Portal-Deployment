@@ -28,3 +28,7 @@ To deploy this project run
 ```bash
   docker-compose up -d
 ```
+
+## Published URL
+
+- Portal URL : http://ip-or-localhost-or-domain
