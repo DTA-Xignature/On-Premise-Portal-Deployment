@@ -22,5 +22,9 @@ To deploy this project run
 
 ```bash
   git clone https://github.com/DTA-Xignature/On-Premise-Portal-Deployment.git
+  cd On-Premise-Portal-Deployment/
+```
+
+```bash
   docker-compose up -d
 ```
