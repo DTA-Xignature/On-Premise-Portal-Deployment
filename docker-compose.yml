@@ -1,0 +1,151 @@
+version: "3.7"
+
+# Settings and configurations that are common for all containers
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2023-07-11T21-29-34Z
+  command: server --console-address ":9001" http://minio{1...4}/data{1...2}
+  expose:
+    - "9000"
+    - "9001"
+  environment:
+    MINIO_ROOT_USER: xignature
+    MINIO_ROOT_PASSWORD: P@ssw0rd123@@
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 20s
+    retries: 3
+  networks:
+    - xignature_net
+
+# starts 4 docker containers running minio server instances.
+# using nginx reverse proxy, load balancing, you can access
+# it through port 9000.
+services:
+  portal:
+    container_name: portal
+    restart: on-failure
+    image: registry.xignature.co.id/xignature/sign-portal:latest
+    ports:
+      - "80:3000"
+    networks:
+      - xignature_net
+
+  gateway:
+    container_name: gateway
+    image: registry.xignature.co.id/xignature/sign-gateway:latest
+    restart: on-failure
+    environment:
+      - TZ=Asia/Jakarta
+      - DATABASE_URL=jdbc:postgresql://database:5432/xignature
+      - DATABASE_USER=xignature
+      - DATABASE_PASSWORD=123456Aa
+      - ENTERPRISE_CODE=6616jO4dYIkIMK3V4dunVVOIVQEUqIWfHiyu
+      - ENTERPRISE_ID=47b5a0ab-6a65-40a1-b91a-f28a015c19d2
+      - MINIO_URL=http://storage:9000
+      - MINIO_ACCESS_KEY=xignature
+      - MINIO_SECRET_KEY=P@ssw0rd123@@
+      - FONT_DIR=/opt/app
+      - API_URL=https://internal.xignature.co.id
+      - EMET_USER=
+      - EMET_PASSWORD=
+      - EMET_PROFILENAME=emeteraicertificateSigner
+      - EMET_JENISDOC_URL=https://stampv2.e-meterai.co.id/jenisdoc
+      - EMET_GENQR_URL=https://stampv2.e-meterai.co.id/snqr/qrimage
+      - EMET_GENSN_URL=https://stampv2.e-meterai.co.id/chanel/stampv2
+      - EMET_LOGIN_URL=https://backendservice.e-meterai.co.id/api/users/login
+    networks:
+      - xignature_net
+    ports:
+      - "1308:1308"
+    volumes:
+      - emeterai-data:/sharefolder
+
+  database:
+    image: postgres:15-alpine
+    restart: on-failure
+    environment:
+      - TZ=Asia/Jakarta
+      - POSTGRES_USER=xignature
+      - POSTGRES_PASSWORD=123456Aa
+    networks:
+      - xignature_net
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  signadapter:
+    container_name: signadapter
+    image: registry.perurica.co.id:443/keystamp/signadapter:latest
+    restart: always
+    privileged: true
+    ports:
+      - 8888:7777/tcp
+    environment:
+      - CRL_URL=empty
+      - MJ_CERTCHAIN_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/getSignerCertChain
+      - MJ_CERTIFICATE_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/getSignerCertificate
+      - MJ_HASH_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/docSigningB
+      - SIGNER_PROFILE_NAME=emeteraicertificateSigner
+      - TSA_URL=http://timestamp.peruri.co.id/signserver/tsa?workerName=TimeStampSigner1101
+      - my.truststore=/keystore/truststore.jks
+      - my.truststore.password=foobar
+    volumes:
+      - emeterai-data:/sharefolder
+    networks:
+      - xignature_net
+
+  minio1:
+    <<: *minio-common
+    container_name: minio1
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    container_name: minio2
+    volumes:
+      - data2-1:/data1
+      - data2-2:/data2
+
+  minio3:
+    <<: *minio-common
+    container_name: minio3
+    volumes:
+      - data3-1:/data1
+      - data3-2:/data2
+
+  minio4:
+    <<: *minio-common
+    container_name: minio4
+    volumes:
+      - data4-1:/data1
+      - data4-2:/data2
+
+  nginx:
+    image: nginx:1.19.2-alpine
+    container_name: storage
+    volumes:
+      - ./deployment/minio/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - xignature_net
+
+## By default this config uses default local driver,
+## For custom volumes replace with volume driver configuration.
+volumes:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+  data3-1:
+  data3-2:
+  data4-1:
+  data4-2:
+  db-data:
+  emeterai-data:
+
+networks:
+  xignature_net:
