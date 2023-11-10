@@ -31,6 +31,15 @@ services:
     networks:
       - xignature_net
 
+  portal-proxy:
+    container_name: portal-proxy
+    restart: on-failure
+    image: registry.xignature.co.id/xignature/portal-proxy
+    ports:
+      - "443:443"
+    networks:
+      - xignature_net
+
   gateway:
     container_name: gateway
     image: registry.xignature.co.id/xignature/sign-gateway
