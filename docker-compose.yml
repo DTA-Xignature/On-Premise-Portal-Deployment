@@ -35,6 +35,9 @@ services:
     container_name: portal-proxy
     restart: on-failure
     image: registry.xignature.co.id/xignature/portal-proxy
+    environment:
+      - HOST_URL=${HOST_URL:- 10.58.4.105}
+      - UPSTREAM_URL=${UPSTREAM_URL:- portal:3000}
     ports:
       - "443:443"
     networks:
