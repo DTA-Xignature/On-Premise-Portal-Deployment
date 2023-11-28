@@ -43,29 +43,35 @@ services:
     networks:
       - xignature_net
 
+  api:
+    container_name: api
+    image: registry.xignature.co.id/xignature/onprem-api
+    restart: on-failure
+    environment:
+      - PORT=3343
+      - DATABASE_URL=postgresql://xignature:123456Aa@database:5432/xignature?schema=public
+      - ENTERPRISE_ID=4eb9cc57-03c1-4450-8474-67457a7a9429
+      - API_KEY=NLV8QnSXkTwNyMv6MrPPD6KNB2SlSh7fzZlg
+      - ENC_KEY=cp2ymFThqS7s0do2FJEWV3oLrZ6jeT6O
+      - ENC_IV=zKtAp5HK7n18KDj
+      - STORAGE_ACCESS_KEY=xignature
+      - STORAGE_ACCESS_SECRET=P@ssw0rd123@@
+      - API_URL=${API_URL:- https://internal.xignature.co.id}
+    networks:
+      - xignature_net
+    ports:
+      - "1994:1994"
+    volumes:
+      - emeterai-data:/sharefolder
+
   gateway:
     container_name: gateway
     image: registry.xignature.co.id/xignature/sign-gateway
     restart: on-failure
     environment:
       - TZ=Asia/Jakarta
-      - DATABASE_URL=jdbc:postgresql://database:5432/xignature
-      - DATABASE_USER=xignature
-      - DATABASE_PASSWORD=123456Aa
-      - ENTERPRISE_CODE=${ENTERPRISE_CODE}
-      - ENTERPRISE_ID=${ENTERPRISE_ID}
-      - MINIO_URL=http://storage:9000
-      - MINIO_ACCESS_KEY=xignature
-      - MINIO_SECRET_KEY=P@ssw0rd123@@
       - FONT_DIR=/opt/app
       - API_URL=${API_URL:- https://internal.xignature.co.id}
-      - EMET_USER=${EMET_USER}
-      - EMET_PASSWORD=${EMET_PASSWORD}
-      - EMET_PROFILENAME=emeteraicertificateSigner
-      - EMET_JENISDOC_URL=https://stampv2.e-meterai.co.id/jenisdoc
-      - EMET_GENQR_URL=https://stampv2.e-meterai.co.id/snqr/qrimage
-      - EMET_GENSN_URL=https://stampv2.e-meterai.co.id/chanel/stampv2
-      - EMET_LOGIN_URL=https://backendservice.e-meterai.co.id/api/users/login
     networks:
       - xignature_net
     ports:
