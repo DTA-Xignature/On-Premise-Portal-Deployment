@@ -50,8 +50,8 @@ services:
     environment:
       - PORT=3343
       - DATABASE_URL=postgresql://xignature:123456Aa@database:5432/xignature?schema=public
-      - ENTERPRISE_ID=4eb9cc57-03c1-4450-8474-67457a7a9429
-      - API_KEY=NLV8QnSXkTwNyMv6MrPPD6KNB2SlSh7fzZlg
+      - ENTERPRISE_ID=${ENTERPRISE_ID}
+      - API_KEY=${ENTERPRISE_CODE}
       - ENC_KEY=cp2ymFThqS7s0do2FJEWV3oLrZ6jeT6O
       - ENC_IV=zKtAp5HK7n18KDj
       - STORAGE_ACCESS_KEY=xignature
