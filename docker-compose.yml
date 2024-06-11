@@ -27,7 +27,7 @@ services:
     restart: on-failure
     image: registry.xignature.co.id/xignature/sign-portal:${DOCKER_TAG:- latest}
     ports:
-      - "80:3000"
+      - "81:3000"
     networks:
       - xignature_net
 
@@ -39,7 +39,7 @@ services:
       - HOST_URL=${HOST_URL:- 10.58.4.105}
       - UPSTREAM_SERVER=${UPSTREAM_SERVER:- portal:3000}
     ports:
-      - "443:443"
+      - "8443:443"
     networks:
       - xignature_net
 
@@ -60,7 +60,7 @@ services:
     networks:
       - xignature_net
     ports:
-      - "1994:1994"
+      - "1994:3343"
     volumes:
       - emeterai-data:/sharefolder
 
@@ -75,7 +75,7 @@ services:
     networks:
       - xignature_net
     ports:
-      - "1308:1308"
+      - "1308:1994"
     volumes:
       - emeterai-data:/sharefolder
 
@@ -86,6 +86,8 @@ services:
       - TZ=Asia/Jakarta
       - POSTGRES_USER=xignature
       - POSTGRES_PASSWORD=123456Aa
+    ports:
+      - "5433:5432"
     networks:
       - xignature_net
     volumes:
@@ -93,18 +95,18 @@ services:
 
   signadapter:
     container_name: signadapter
-    image: registry.perurica.co.id:443/keystamp/signadapter:latest
+    image: registry.perurica.co.id/e-meterai/signadapter:latest
     restart: always
     privileged: true
     ports:
       - 8888:7777/tcp
     environment:
       - CRL_URL=empty
-      - MJ_CERTCHAIN_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/getSignerCertChain
-      - MJ_CERTIFICATE_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/getSignerCertificate
-      - MJ_HASH_URL=https://signing.keysign.my.id/keystamp/pdfsigning/rest/docSigningB
+      - MJ_CERTCHAIN_URL=https://stampservice.e-meterai.co.id/keystamp/pdfsigning/rest/getSignerCertChain
+      - MJ_CERTIFICATE_URL=https://stampservice.e-meterai.co.id/keystamp/pdfsigning/rest/getSignerCertificate
+      - MJ_HASH_URL=https://stampservice.e-meterai.co.id/keystamp/pdfsigning/rest/docSigningB
       - SIGNER_PROFILE_NAME=emeteraicertificateSigner
-      - TSA_URL=http://timestamp.peruri.co.id/signserver/tsa?workerName=TimeStampSigner1101
+      - TSA_URL=http://tsa.e-meterai.co.id/signserver/tsa?workerName=TimeStampSigner1101
       - my.truststore=/keystore/truststore.jks
       - my.truststore.password=foobar
     volumes:
