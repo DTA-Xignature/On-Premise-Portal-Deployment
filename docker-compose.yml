@@ -57,6 +57,7 @@ services:
       - STORAGE_ACCESS_KEY=xignature
       - STORAGE_ACCESS_SECRET=P@ssw0rd123@@
       - API_URL=${API_URL:- https://internal.xignature.co.id}
+      - OPEN_API_URL=${OPEN_API_URL:- https://api.xignature.co.id}
     networks:
       - xignature_net
     ports:
